@@ -47,13 +47,13 @@ A `Transition` has a stable `id` (unique among the successors of one state), `ki
 
 ### Outcomes (exactly one)
 
-| Status         | Meaning                                                                                                                             |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `violated`     | A reachable state breaks the rule. A shortest counterexample (within the explored graph) is attached.                                |
+| Status         | Meaning                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `violated`     | A reachable state breaks the rule. A shortest counterexample (within the explored graph) is attached.                                                                     |
 | `bounded-safe` | The search finished without finding a violation. `limitsHit` lists depth/branching cutoffs that hid states; empty means the model's whole reachable space was enumerated. |
-| `exhausted`    | The `maxStates` budget ran out before the search could conclude. Says nothing about safety.                                         |
-| `cancelled`    | Stopped on request. Counters so far are reported. Says nothing about safety.                                                        |
-| `invalid`      | The request failed validation. No exploration ran. Issues are listed.                                                               |
+| `exhausted`    | The `maxStates` budget ran out before the search could conclude. Says nothing about safety.                                                                               |
+| `cancelled`    | Stopped on request. Counters so far are reported. Says nothing about safety.                                                                                              |
+| `invalid`      | The request failed validation. No exploration ran. Issues are listed.                                                                                                     |
 
 Every outcome carries the engine version, applied limits, counters (`statesDiscovered`, `statesExpanded`, `transitionsGenerated`, `duplicatesSkipped`, `maxDepthReached`, `branchTruncations`, `depthCutoffStates`) and a stop reason. Copy never says "safe" or "proved"; it says "no violation found within these limits" and, when `limitsHit` is empty, "the whole modelled state space was explored" with an explicit reminder that it is a model.
 
@@ -65,16 +65,16 @@ Every outcome carries the engine version, applied limits, counters (`statesDisco
 
 Workflows are declared as clients (who send requests), request handlers (ordered steps against durable state), and an invariant list. The kit supplies the shared environment: an ordered in-flight network, per-client status (`idle`, `waiting`, `done`, `gave-up`), active handlers, and remaining failure budgets.
 
-| Control              | Range | Semantics                                                                                                                         |
-| -------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `duplicate`          | 0–2   | Delivering a message may leave a copy in flight; each copy spends one unit.                                                        |
-| `lostResponse`       | 0–2   | A response in flight can be dropped after the service already produced its effect.                                                |
-| `delay`              | on/off | A client timeout may fire while its messages are still in flight. Off: a timeout needs the client's traffic to be gone.            |
-| `reorder`            | on/off | Any in-flight message may be delivered next. Off: only the oldest message per destination.                                         |
-| `concurrent`         | on/off | Handlers run step by step and several may interleave. Off: with no crash the handler is atomic; with crash it is one at a time.   |
-| `crash`              | 0–1   | The service can crash between two writes of a running handler; durable writes stay, in-memory progress and the response are lost. |
-| `retry`              | 0–2   | After a timeout a client may resend (same key, next attempt) instead of giving up.                                                 |
-| `lateRetry`          | 0–1   | A stale retry timer may resend a request after the client already finished or gave up.                                             |
+| Control        | Range  | Semantics                                                                                                                         |
+| -------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `duplicate`    | 0–2    | Delivering a message may leave a copy in flight; each copy spends one unit.                                                       |
+| `lostResponse` | 0–2    | A response in flight can be dropped after the service already produced its effect.                                                |
+| `delay`        | on/off | A client timeout may fire while its messages are still in flight. Off: a timeout needs the client's traffic to be gone.           |
+| `reorder`      | on/off | Any in-flight message may be delivered next. Off: only the oldest message per destination.                                        |
+| `concurrent`   | on/off | Handlers run step by step and several may interleave. Off: with no crash the handler is atomic; with crash it is one at a time.   |
+| `crash`        | 0–1    | The service can crash between two writes of a running handler; durable writes stay, in-memory progress and the response are lost. |
+| `retry`        | 0–2    | After a timeout a client may resend (same key, next attempt) instead of giving up.                                                |
+| `lateRetry`    | 0–1    | A stale retry timer may resend a request after the client already finished or gave up.                                            |
 
 Budgets are global, stored in state, and strictly decrease, so every combination is finite. Transition order is: client sends, request deliveries (each followed by its duplicate variant), handler steps, response deliveries, timeouts/retries, late retries, then fault injections (drop, crash).
 
