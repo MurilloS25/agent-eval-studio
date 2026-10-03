@@ -271,3 +271,18 @@ export async function exploreAsync<S extends Json>(
     await yieldControl();
   }
 }
+
+/** Outcome for a run that was stopped from outside the engine, for example by a host timeout. */
+export function cancelledOutcome(
+  stats: ExplorationStats,
+  limits: Limits | null,
+): ExplorationOutcome {
+  return {
+    status: 'cancelled',
+    engineVersion: ENGINE_VERSION,
+    limits,
+    stats: { ...stats },
+    stopReason: 'cancelled',
+    limitsHit: [],
+  };
+}

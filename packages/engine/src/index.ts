@@ -18,3 +18,4 @@ export type {
   TemplateDef,
 } from './templates';
 export * from './golden';
+export * from './view';
