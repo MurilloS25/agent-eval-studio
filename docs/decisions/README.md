@@ -1,6 +1,6 @@
 # Architecture decisions
 
-Record decisions that constrain future work or change evaluation semantics. Routine implementation choices do not need an ADR.
+Record decisions that constrain future work or change workflow, failure, invariant, exploration, or replay semantics. Routine implementation choices do not need an ADR.
 
 ```markdown
 # Decision title

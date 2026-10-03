@@ -1,58 +1,62 @@
-# AgentEval Studio agent guide
+# Invariant Trail agent guide
 
 ## Mission
 
-Build a portfolio-quality workspace that compares LLM and agent variants against repeatable, version-controlled scenarios and makes regressions, cost, latency, and uncertainty visible.
+Build a portfolio-quality visual simulator that helps people discover how realistic delivery, retry, crash, and concurrency failures can violate safety invariants in stateful workflows.
 
 ## Canonical sources
 
-Read `README.md`, `docs/ARCHITECTURE.md`, and the closest schemas, fixtures, adapters, and tests before non-trivial work. Identify and resolve conflicts between documentation and executable behavior.
+Read `README.md`, `docs/ARCHITECTURE.md`, `docs/HARNESS.md`, the active plan, and the closest contracts and tests before non-trivial work. Resolve conflicts between prose and executable behavior explicitly.
 
 ## Product invariants
 
-- An evaluation result is reproducible from its suite version, case definition, runner version, provider/model configuration, and captured parameters.
-- Never silently change historical results, expected behavior, thresholds, or grader prompts.
-- Keep deterministic assertions separate from heuristic or model-assisted judgments.
-- Store raw observable inputs and outputs needed for auditing, but never persist provider secrets.
-- Label model-assisted scores with evaluator identity, configuration, and limitations.
-- Compare variants under equivalent conditions or disclose the differences prominently.
-- Cost and latency are measurements with units and sampling context, not universal constants.
-- Provider-specific behavior stays behind adapters; the core result schema remains provider-neutral.
+- The same workflow, controls, engine version, and bounds produce the same exploration result and counterexample.
+- Exploration is finite and visibly bounded by validated limits; cancellation and exhaustion are distinct outcomes.
+- A reported counterexample is replayable from the initial state, with every transition and state change preserved.
+- State identity is canonical. Equivalent states deduplicate reliably, and hashing never depends on object insertion order or wall-clock time.
+- The engine never executes arbitrary user code, fetches arbitrary URLs, or requires secrets.
+- Curated templates are usable without writing JSON or YAML.
+- Safety claims are precise: distinguish “no violation found within these bounds” from proof over an unbounded system.
+- Failure semantics are explicit. Duplicates, delays, crashes, retries, and concurrent actions must not be silently collapsed.
+- The UI explains the violated invariant and the causal path; it does not merely paint a node red.
 
 ## Intended repository shape
 
-- `apps/web`: Next.js suite editor, run comparison, trace, regression, and export views.
-- `apps/api`: FastAPI run orchestration, provider adapters, grading, and report endpoints.
-- `packages/contracts`: shared suite, case, trace, measurement, score, and report schemas when useful.
-- `evals`: version-controlled suites, fixtures, grader configurations, and expected behaviors.
+- `apps/web`: visual workspace, controls, exploration status, result summary, and counterexample replay.
+- `packages/engine`: pure deterministic workflow semantics, failure expansion, bounded exploration, and trace reconstruction.
+- `packages/contracts`: shared workflow, invariant, exploration, and trace schemas when a boundary needs them.
+- `examples`: version-controlled built-in workflows and expected counterexamples.
 - `docs`: architecture, decisions, and active implementation plans.
 
-Add boundaries only when an implemented slice needs them.
+Add boundaries only when an implemented slice needs them. A single Next.js application plus pure TypeScript packages is preferred unless evidence justifies a separate API.
 
 ## Engineering rules
 
-- Define schemas before building comparison UI.
-- Give every suite, case, variant, run, trace event, metric, grader, and artifact a stable identifier.
-- Capture timestamps, duration units, token accounting source, provider response metadata, and errors explicitly.
-- Make retries visible; do not merge retry measurements into a successful run silently.
-- Deterministic evaluators must be pure and testable without a model call.
-- Model-assisted graders require calibration examples and cannot be presented as objective truth.
-- Use fake providers in ordinary tests; live-provider tests are opt-in and clearly cost-bearing.
-- Prefer JSON fixtures initially. Add a database only when experiment history or collaboration requires it.
-- Avoid comparing scores with incompatible scales or grader versions.
+- Define the state, transition, invariant, failure, bound, and result contracts before building the main visualization.
+- Keep the exploration engine pure and independent from React and browser APIs.
+- Prefer breadth-first search for shortest counterexamples unless a documented decision changes the objective.
+- Use canonical serialization or an equally explicit state-key strategy; test key-order independence and collision assumptions.
+- Keep exploration limits conservative in the browser. Show progress, allow cancellation, and avoid blocking the main thread when meaningful workloads require isolation.
+- Validate every imported or URL-derived value. Treat workflow labels and descriptions as untrusted text.
+- Use seeded or enumerated behavior only; never hide nondeterminism behind `Math.random()`.
+- Make failure injection composable but bounded. Test combined failures, not only isolated toggles.
+- Built-in examples must include both a safe configuration and at least one known shortest counterexample.
+- Accessibility includes keyboard operation, focus visibility, non-color-only status, reduced-motion support, and readable graph alternatives.
+- Ordinary tests are offline and free. Do not add provider SDKs, telemetry services, databases, or authentication without an accepted decision.
 
 ## Workflow
 
-1. Inspect affected schemas, fixtures, and comparison semantics.
-2. Plan work under `docs/plans/` when it spans runner, grader, API, and UI boundaries.
-3. Implement the smallest reproducible evaluation slice.
-4. Test schemas and deterministic evaluators before provider integrations.
-5. Run narrow checks, then the documented suite.
-6. Review the diff for reproducibility, accidental mutation, measurement validity, secret exposure, and misleading presentation.
-7. Record durable architecture decisions under `docs/decisions/`.
+1. Inspect the affected contracts, example semantics, and current active plan.
+2. Plan cross-boundary work under `docs/plans/`, but keep implementation moving when the task authorizes autonomous delivery.
+3. Implement vertical slices: contracts and engine first, then worker/API boundary if needed, then interface.
+4. Prove engine behavior with unit, property-oriented, fixture, and replay tests before relying on visual checks.
+5. Run narrow checks, then the documented full suite and production build.
+6. Exercise the finished experience in a real browser across desktop and narrow viewports.
+7. Review for correctness, state explosion, unsafe input handling, accessibility, misleading claims, and missing tests.
+8. Record only durable architecture decisions under `docs/decisions/`.
 
-Do not invent build commands before scaffolding exists. Update `docs/HARNESS.md` when real commands become stable.
+Do not invent passing commands. Update `docs/HARNESS.md` as soon as real install, run, test, lint, typecheck, and build commands exist.
 
 ## Definition of done
 
-A change is complete when results can be traced to their inputs and configurations, retries and failures remain visible, deterministic behavior is tested, model-assisted uncertainty is disclosed, documentation is current, and only executed checks are reported as passing.
+A change is complete when its state semantics are explicit, deterministic behavior and counterexample minimality are tested, limits and residual uncertainty are visible, untrusted inputs cannot become executable behavior, the primary workflow is accessible, documentation matches reality, and only checks actually run are reported as passing.

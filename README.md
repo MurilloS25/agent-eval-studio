@@ -1,10 +1,10 @@
-# AgentEval Studio
+# Invariant Trail
 
-Developer-focused workspace for testing LLM and agent behavior against repeatable scenarios before prompts or workflows are released.
+Visual failure simulator for stateful workflows. Invariant Trail explores retries, duplicates, crashes, delays, and concurrency to find the shortest execution path that breaks a safety rule.
 
 ## Status
 
-Development harness ready; implementation has not started.
+Product direction and development harness are ready. Implementation has not started.
 
 ## Start here
 
@@ -12,37 +12,32 @@ Development harness ready; implementation has not started.
 - [Development harness](docs/HARNESS.md)
 - [Agent guide](AGENTS.md)
 
-## Proposed MVP
+## Product experience
 
-- Define version-controlled test cases and expected behaviors.
-- Run the same cases against prompt or agent variants.
-- Evaluate structured output, tool selection, latency, token use, and task-specific criteria.
-- Compare runs and highlight regressions.
-- Export a concise evaluation report.
+1. Choose a built-in workflow such as booking, payment/refund, inventory/order, or webhook processing.
+2. Inspect its states and transitions in a visual graph.
+3. Select a plain-language safety invariant, such as “never confirm the same booking twice.”
+4. Enable realistic failure conditions: duplicate delivery, a lost response after a side effect, delayed or out-of-order events, concurrent operations, a crash between writes, or a late retry.
+5. Explore the finite state space deterministically.
+6. Replay the shortest counterexample step by step and see exactly where state became unsafe.
 
-## Proposed stack
+## Initial product boundary
 
-- Next.js, React, TypeScript, and Tailwind CSS
-- Python and FastAPI
-- Pytest-based evaluation utilities
-- Provider-agnostic LLM adapters
-- JSON fixtures for the initial test suites
-- Vercel for the web experience
+- Local-first and deterministic; no LLM or paid provider is required.
+- Curated workflow templates and typed controls, not an arbitrary-code runner.
+- No arbitrary remote URLs, credentials, or untrusted program execution.
+- A bounded explorer with explicit limits, stable state hashing, deduplication, and reproducible results.
+- JSON/YAML may later become optional import/export formats, but they are not the primary experience.
 
-## Data approach
+## What this project demonstrates
 
-The initial version will keep test suites in version-controlled files and produce downloadable results. Persistence will be added only if experiment history and collaboration justify a database.
+State-machine design, model-based testing, bounded state-space exploration, failure injection, idempotency and concurrency reasoning, shortest-counterexample generation, secure input boundaries, and accessible data visualization.
 
-## What this project is meant to demonstrate
+## Proposed first release
 
-LLM evaluation, regression testing, observability, structured outputs, cost and latency analysis, and production-minded AI engineering.
-
-## Initial roadmap
-
-1. Define the evaluation model and result schema.
-2. Implement deterministic and model-assisted evaluators.
-3. Build prompt and agent comparison views.
-4. Add regression thresholds and exportable reports.
-5. Validate the tool using Voice Agent scenarios.
-
-
+- A polished visual workspace with several built-in workflows.
+- Typed invariant and failure controls.
+- Deterministic breadth-first exploration with visible bounds and progress.
+- Safe/unsafe results with a shortest counterexample.
+- Step-by-step replay showing events, state diffs, and the violated invariant.
+- Offline tests, documented limitations, and a deployable public demo that needs no account or external service.
