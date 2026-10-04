@@ -6,7 +6,7 @@
     "allowJs": false,
     "incremental": true,
     "plugins": [{ "name": "next" }],
-    "types": ["node", "@testing-library/jest-dom"]
+    "types": ["node"]
   },
   "include": ["next-env.d.ts", "src", "e2e", "playwright.config.ts", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

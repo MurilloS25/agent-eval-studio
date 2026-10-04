@@ -1,5 +1,7 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -27,6 +29,12 @@ export default tseslint.config(
       'no-new-func': 'error',
     },
   },
+  {
+    files: ['apps/web/**/*.{ts,tsx}'],
+    plugins: { 'react-hooks': reactHooks },
+    rules: reactHooks.configs.recommended.rules ?? {},
+  },
+  { files: ['apps/web/**/*.tsx'], ...jsxA11y.flatConfigs.recommended },
   {
     // The engine is a pure domain: no DOM, no clock, no randomness, no network.
     files: ['packages/engine/src/**/*.ts'],

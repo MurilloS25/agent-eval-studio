@@ -85,6 +85,8 @@ export function ReplayPanel({ outcome, request, step, dispatch }: Props) {
       </p>
 
       <div className="replay-layout">
+        {/* Key events bubble up from the focusable step buttons inside this list. */}
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
         <ol className="trail" onKeyDown={onKeyDown} aria-label="Steps of the counterexample">
           <li className={selected === 0 ? 'trail-item is-selected' : 'trail-item'}>
             <button

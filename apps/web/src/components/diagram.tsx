@@ -41,10 +41,12 @@ export function LifecycleDiagram({ title, lifecycle, current }: Props) {
 
   return (
     <div className="diagram">
+      {/* Scrollable regions must be focusable so keyboard users can pan the diagram. */}
       <div
         className="diagram-scroll"
         role="region"
         aria-label={`${title} diagram, scrollable`}
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
       >
         <svg

@@ -1,5 +1,8 @@
 'use client';
 
+/* The rule cannot see text inside nested spans: each label wraps its input and a text span. */
+/* eslint-disable jsx-a11y/label-has-associated-control */
+
 import { LIMIT_BOUNDS, type FaultSettings } from '@invariant-trail/contracts';
 import { getTemplate, TEMPLATES, type Preset, type TemplateDef } from '@invariant-trail/engine';
 import type { Dispatch } from 'react';
